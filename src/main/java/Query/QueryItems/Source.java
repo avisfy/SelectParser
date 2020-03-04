@@ -1,7 +1,7 @@
 package Query.QueryItems;
 
-
 import Query.Query;
+import Query.QueryException;
 
 public class Source {
     private String table = null;
@@ -24,14 +24,19 @@ public class Source {
 
 
     public String getString() {
-        if (table != null) {
-            return "Source: " + table;
-        } else if (joinedTable != null) {
-            return "Source: " + joinedTable.getString();
-        } else if (subQuery != null) {
-            return "Source: " + joinedTable.getString();
-        } else {
-            return "";
+        String resString = "";
+        try {
+            if (table != null) {
+                resString =  "Source: " + table;
+            } else if (joinedTable != null) {
+                resString =  "Source: " + joinedTable.getString();
+            } else if (subQuery != null) {
+                resString =  "Source: " + subQuery.getString();
+            }
+        } catch (QueryException e) {
+            e.getError();
+            resString = "";
         }
+        return resString;
     }
 }

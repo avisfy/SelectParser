@@ -43,7 +43,7 @@ public class LexParser {
                 if (lexeme.equals("select")) {
                     q.setSelectItems(parseSelect());
                 }
-                if (lexeme .equals("from")) {
+                if (lexeme.equals("from")) {
                     System.out.println("From");
                 }
                 nextLexeme();
@@ -55,21 +55,25 @@ public class LexParser {
     }
 
     //return true if end of lexemes array
-    private  ArrayList<ColumnItem> parseSelect() {
+    private ArrayList<ColumnItem> parseSelect() {
         ArrayList<ColumnItem> selectItems = null;
         try {
             String lexeme;
-            ColumnItem column;
+            ColumnItem column = null;
             ColumnItem.Functions fun;
             selectItems = new ArrayList<>();
             do {
                 lexeme = nextLexeme();
-                switch (lexeme){
+                switch (lexeme) {
+                    case "*":
+                        column = new ColumnItem();
+                        selectItems.add(column);
+                        return selectItems;
                     case "max":
                         //"("
                         fun = ColumnItem.Functions.MAX;
                         column = parseAggregateFunct(fun);
-                    break;
+                        break;
                     case "min":
                         //"("
                         fun = ColumnItem.Functions.MIN;
@@ -90,21 +94,25 @@ public class LexParser {
                         fun = ColumnItem.Functions.COUNT;
                         column = parseAggregateFunct(fun);
                         break;
-                        //subquery
+                    //subquery
                     case "(":
-                        //lexeme = nextLexeme();
-                        if (lexeme.equals("SELECT")){
+                        lexeme = nextLexeme();
+                        if (lexeme.equals("select")) {
+                            pos--;
                             Query subQuery = new Query();
                             parseQuery(subQuery);
                             column = new ColumnItem(subQuery);
                             nextLexeme();
+                        } else {
+                            column = null;
                         }
+                        break;
                     default:
                         column = parseColumn(lexeme);
                 }
-                selectItems.add(column);
-                System.out.println("in parse" +  nextLexeme());
-                pos--;
+                if (column != null) {
+                    selectItems.add(column);
+                }
             } while ((lexeme = nextLexeme()).equals(","));
         } catch (QueryException e) {
             e.getError();
@@ -113,9 +121,9 @@ public class LexParser {
     }
 
 
-    private ColumnItem parseColumn(String lexeme ) {
+    private ColumnItem parseColumn(String lexeme) {
         ColumnItem column = null;
-        try{
+        try {
             String str1 = lexeme;
             String str2 = nextLexeme();
             if (str2.equals(".")) {
@@ -141,34 +149,35 @@ public class LexParser {
         return column;
     }
 
+    //column in aggregate function
     private ColumnItem parseAggregateFunct(ColumnItem.Functions fun) {
         ColumnItem column = null;
-           try {
-               nextLexeme();
-               String str1 = nextLexeme();
-               String str2 = nextLexeme();
-               if (str2.equals(".")) {
-                   //means that str1 - table; str2 - column
-                   str2 = nextLexeme();
-                   nextLexeme();
-               } else {
-                   //means that str1 - column
-                   str2 = "";
-               }
-               String str3 =  nextLexeme();
-               //alias
-               if (str3.equals("as")) {
-                   //have alias
-                   str3 = nextLexeme();
-               } else {
-                   str3 = "";
-                   pos--;
-               }
-               column = new ColumnItem(fun, str1, str2, str3);
-           } catch (QueryException e) {
-               e.getError();
-           }
-           return column;
+        try {
+            nextLexeme();
+            String str1 = nextLexeme();
+            String str2 = nextLexeme();
+            if (str2.equals(".")) {
+                //means that str1 - table; str2 - column
+                str2 = nextLexeme();
+                nextLexeme();
+            } else {
+                //means that str1 - column
+                str2 = "";
+            }
+            String str3 = nextLexeme();
+            //alias
+            if (str3.equals("as")) {
+                //have alias
+                str3 = nextLexeme();
+            } else {
+                str3 = "";
+                pos--;
+            }
+            column = new ColumnItem(fun, str1, str2, str3);
+        } catch (QueryException e) {
+            e.getError();
+        }
+        return column;
     }
 
 

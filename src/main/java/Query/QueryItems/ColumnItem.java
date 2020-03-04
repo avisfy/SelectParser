@@ -42,6 +42,11 @@ public class ColumnItem {
         this.type = ItemTypes.COLUMN_FROM_SUBQUERY;
     }
 
+    //All (*)
+    public ColumnItem() {
+        this.type = ItemTypes.ALL;
+    }
+
     //pure column
     public ColumnItem(String name1, String name2, String alias) {
         if (!name1.isEmpty()) {
@@ -59,7 +64,9 @@ public class ColumnItem {
 
     public String getString() {
         String resStr = "";
-        if (type == ItemTypes.COLUMN) {
+        if (type == ItemTypes.ALL) {
+            resStr = "*";
+        } else if (type == ItemTypes.COLUMN) {
             if (source != null) {
                 resStr = source.getString();
             }
@@ -72,6 +79,8 @@ public class ColumnItem {
             }
             resStr = resStr + name;
             resStr = resStr + ")" + " " + alias;
+        } else if(type == ItemTypes.COLUMN_FROM_SUBQUERY) {
+            resStr = source.getString();
         }
         return resStr;
     }
