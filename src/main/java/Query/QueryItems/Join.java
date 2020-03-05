@@ -1,10 +1,9 @@
 package Query.QueryItems;
 
-import Query.Query;
 import Query.QueryException;
 
 public class Join {
-    enum JoinType {
+    public enum JoinType {
         INNER_JOIN(0),
         LEFT_JOIN(1),
         RIGHT_JOIN(2),
@@ -18,32 +17,29 @@ public class Join {
         }
     }
 
-    private String rTable = null;
-    private String lTable = null;
+    private Table rTable = null;
     private JoinType join = null;
     private ColumnItem rTableCol = null;
     private ColumnItem lTableCol = null;
-    private Query subQuery = null;
     private static final String JOIN_EXCEPTION = "JOIN_EXCEPTION";
 
-    public Join(String leftTable, JoinType join, String rightTable, ColumnItem leftTableCol, ColumnItem rightTableCol) {
-        lTable = leftTable;
-        rTable = rightTable;
-        this.join = join;
-        if (join != JoinType.IMPLICIT_JOIN) {
-            lTableCol = leftTableCol;
-            rTableCol = rightTableCol;
+    //for implicit join
+    public Join(JoinType type, Table table) throws QueryException {
+        if (type != JoinType.IMPLICIT_JOIN){
+            throw new QueryException(JOIN_EXCEPTION, "Attempt not implicitly join tables without columns");
         }
+        rTable = table;
+        join = type;
     }
 
-    public Join(String leftTable, JoinType join, String rightTable) throws QueryException {
-        if (join == JoinType.IMPLICIT_JOIN) {
-            lTable = leftTable;
-            rTable = rightTable;
-            this.join = join;
-        } else {
-            throw new QueryException(JOIN_EXCEPTION, "Not implicit join need columns connection");
+    public Join(JoinType type, Table table, ColumnItem col1, ColumnItem col2) throws QueryException {
+        if (type == JoinType.IMPLICIT_JOIN){
+            throw new QueryException(JOIN_EXCEPTION, "Attempt implicitly join tables with columns");
         }
+        rTable = table;
+        join = type;
+        rTableCol = col1;
+        lTableCol = col2;
     }
 
     public String getString() {
@@ -63,11 +59,11 @@ public class Join {
                 break;
             case IMPLICIT_JOIN:
                 joinStr = "";
-                return "Join: " + lTable + " " + " " + rTable + " " + joinStr;
+                return "Join: " + " " + rTable + " " + joinStr;
             default:
                 return "";
         }
-        return "Join: " + lTable + " " + " " + rTable + " " + joinStr;
+        return "Join: " + " " + rTable + " " + joinStr;
     }
 
 }

@@ -1,8 +1,12 @@
 package Query;
 
 import Query.QueryItems.ColumnItem;
+import Query.QueryItems.Join;
+import Query.QueryItems.Source;
+import Query.QueryItems.Table;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LexParser {
     private String input;
@@ -36,6 +40,7 @@ public class LexParser {
         pos = 0;
     }
 
+
     public void parseQuery(Query q) {
         String lexeme;
         try {
@@ -44,6 +49,7 @@ public class LexParser {
                     q.setSelectItems(parseSelect());
                 }
                 if (lexeme.equals("from")) {
+                    q.setFromSources(parseFrom());
                     System.out.println("From");
                 }
                 nextLexeme();
@@ -121,6 +127,101 @@ public class LexParser {
     }
 
 
+    private List<Source> parseFrom() {
+        List<Source> sources = null;
+        try {
+            Table table1 = parseTable();
+            sources = new ArrayList<Source>();
+            sources.add(new Source(table1));
+            String lexeme1;
+            do{
+                lexeme1 = nextLexeme();
+                Join.JoinType type;
+                switch (lexeme1) {
+                    case "inner":
+                        type = Join.JoinType.INNER_JOIN;
+                        parseJoin(type);
+                        break;
+                    case "left":
+                        type = Join.JoinType.LEFT_JOIN;
+                        parseJoin(type);
+                        break;
+                    case "right":
+                        type = Join.JoinType.RIGHT_JOIN;
+                        parseJoin(type);
+                        break;
+                    case "full":
+                        type = Join.JoinType.FULL_JOIN;
+                        parseJoin(type);
+                        break;
+                    case ",":
+                        type = Join.JoinType.IMPLICIT_JOIN;
+                        parseJoin(type);
+                        break;
+                }
+            } while(!(lexeme1 = nextLexeme()).equals("where"));
+            pos--;
+        } catch (QueryException e) {
+            e.getError();
+        }
+        return sources;
+    }
+
+
+    private Join parseJoin(Join.JoinType type) {
+        Join join = null;
+        Table joinedTable = null;
+        try {
+            if (type == Join.JoinType.IMPLICIT_JOIN) {
+                joinedTable = parseTable();
+                join = new Join(type, joinedTable);
+                return join;
+            }
+            //skip "join"
+            nextLexeme();
+            joinedTable = parseTable();
+            //skip "on"
+            nextLexeme();
+            ColumnItem column1 = parseColumn(nextLexeme());
+            //skip "="
+            nextLexeme();
+            ColumnItem column2 = parseColumn(nextLexeme());
+            join =  new Join(type, joinedTable, column1, column2);
+        } catch (QueryException e) {
+            e.getError();
+        }
+        return join;
+    }
+
+
+    private Table parseTable() {
+        Table table = null;
+        try {
+            String lexeme1 = nextLexeme();
+            if (lexeme1.equals("(")) {
+                if (nextLexeme().equals("select")) {
+                    pos--;
+                    Query subQuery = new Query();
+                    parseQuery(subQuery);
+                    table =  new Table(subQuery);
+                    return table;
+                }
+            }
+            String lexeme2 = nextLexeme();
+            if (lexeme2.equals("as")) {
+                lexeme2 = nextLexeme();
+                table =  new Table( lexeme1, lexeme2);
+            } else {
+                pos--;
+                table =  new Table( lexeme1);
+            }
+        } catch (QueryException e) {
+            e.getError();
+        }
+        return table;
+    }
+
+
     private ColumnItem parseColumn(String lexeme) {
         ColumnItem column = null;
         try {
@@ -189,11 +290,13 @@ public class LexParser {
         }
     }
 
+
     public void printLexemes() {
         for (String lexeme : lexemes) {
             System.out.println(lexeme);
         }
     }
+
 
     private void addLexeme() {
         if (buf.length() != 0) {

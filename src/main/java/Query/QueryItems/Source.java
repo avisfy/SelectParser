@@ -4,13 +4,12 @@ import Query.Query;
 import Query.QueryException;
 
 public class Source {
-    private String table = null;
+    private Table singleTable = null;
     private Join joinedTable = null;
     private Query subQuery = null;
-    private String alias = null;
 
-    public Source(String table) {
-        this.table = table;
+    public Source(Table table) {
+        this.singleTable = table;
     }
 
     public Source(Query subQuery) {
@@ -22,12 +21,11 @@ public class Source {
     }
 
 
-
     public String getString() {
         String resString = "";
         try {
-            if (table != null) {
-                resString =  "Source: " + table;
+            if (singleTable != null) {
+                resString =  "Source: " + singleTable.getString();
             } else if (joinedTable != null) {
                 resString =  "Source: " + joinedTable.getString();
             } else if (subQuery != null) {

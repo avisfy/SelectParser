@@ -17,7 +17,7 @@ public class ColumnItem {
 
     private final ItemTypes type;
     private String name = ""; //not null if type == COLUMN, COLUMN_IN_FUNCTION
-    private Source source = null; //not null if type == COLUMN, COLUMN_IN_FUNCTION, COLUMN_FROM_SUBQUERY
+    private Source tableSource = null; //not null if type == COLUMN, COLUMN_IN_FUNCTION, COLUMN_FROM_SUBQUERY
     private String alias = "";
     private Functions function = null;
 
@@ -25,7 +25,7 @@ public class ColumnItem {
     public ColumnItem(Functions type, String name1, String name2, String alias) {
         this.function = type;
         if (!name1.isEmpty()) {
-            this.source = new Source(name1);
+            this.tableSource = new Source(new Table(name1));
             this.name = name2;
         } else {
             this.name = name1;
@@ -38,7 +38,7 @@ public class ColumnItem {
 
     //subquery
     public ColumnItem(Query subQuery) {
-        this.source = new Source(subQuery);
+        this.tableSource = new Source(subQuery);
         this.type = ItemTypes.COLUMN_FROM_SUBQUERY;
     }
 
@@ -50,7 +50,7 @@ public class ColumnItem {
     //pure column
     public ColumnItem(String name1, String name2, String alias) {
         if (!name1.isEmpty()) {
-            this.source = new Source(name1);
+            this.tableSource = new Source(new Table(name1));
             this.name = name2;
         } else {
             this.name = name1;
@@ -67,20 +67,20 @@ public class ColumnItem {
         if (type == ItemTypes.ALL) {
             resStr = "*";
         } else if (type == ItemTypes.COLUMN) {
-            if (source != null) {
-                resStr = source.getString();
+            if (tableSource != null) {
+                resStr = tableSource.getString();
             }
             resStr = resStr + " "  + name;
             resStr = resStr + " " + alias;
         } else if(type == ItemTypes.COLUMN_IN_FUNCTION) {
             resStr = function.name() + "(";
-            if (source != null) {
-                resStr = resStr + source.getString() + " ";
+            if (tableSource != null) {
+                resStr = resStr + tableSource.getString() + " ";
             }
             resStr = resStr + name;
             resStr = resStr + ")" + " " + alias;
         } else if(type == ItemTypes.COLUMN_FROM_SUBQUERY) {
-            resStr = source.getString();
+            resStr = tableSource.getString();
         }
         return resStr;
     }

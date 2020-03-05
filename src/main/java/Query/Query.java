@@ -13,8 +13,8 @@ public class Query {
     private List<Sort> sortColumns = null;
     private Integer limit = null;
     private Integer offset = null;
-    private static final String QUERY_EXCEPTION = "QUERY_EXCEPTION";
     private LexParser parser;
+    private static final String QUERY_EXCEPTION = "QUERY_EXCEPTION";
 
     public Query(String strQuery) throws QueryException {
         strQuery = strQuery.toLowerCase();
@@ -26,7 +26,9 @@ public class Query {
     public Query() {}
 
     public void setSelectItems(List<ColumnItem> selectItems) {
-        this.selectItems = selectItems;
+        if (!selectItems.isEmpty()) {
+            this.selectItems = selectItems;
+        }
     }
 
     public void setFromSources(List<Source> fromSources) {
