@@ -49,8 +49,9 @@ public class LexParser {
                 }
                 System.out.println(pos);
                 if (lexeme.equals("from")) {
-                    //q.setFromSources(parseFrom());
+                    q.setFromSources(parseFrom());
                     System.out.println("From");
+                    lexeme = nextLexeme();
                 }
             }
         } catch (QueryException e) {
@@ -116,36 +117,51 @@ public class LexParser {
     private List<QueryItem> parseFrom() {
         List<QueryItem> sources = null;
         try {
-            Table table1 = parseTable();
+            String lexeme1 = nextLexeme();
+            QueryItem table;
+            if (lexeme1.equals("(")) {
+                table = parseSubq();
+            } else  {
+                pos--;
+                table = parseTable();
+            }
             sources = new ArrayList<>();
-            sources.add(table1);
-            String lexeme1;
-            do{
-                lexeme1 = nextLexeme();
+            sources.add(table);
+            lexeme1 = nextLexeme();
+            while(lexeme1.equals("inner") || lexeme1.equals("left") || lexeme1.equals("right") || lexeme1.equals("full") || lexeme1.equals(",")){
+                table = null;
                 Join.JoinType type;
                 switch (lexeme1) {
                     case "inner":
                         type = Join.JoinType.INNER_JOIN;
-                        parseJoin(type);
+                        table = parseJoin(type);
                         break;
                     case "left":
                         type = Join.JoinType.LEFT_JOIN;
-                        parseJoin(type);
+                        table = parseJoin(type);
                         break;
                     case "right":
                         type = Join.JoinType.RIGHT_JOIN;
-                        parseJoin(type);
+                        table = parseJoin(type);
                         break;
                     case "full":
                         type = Join.JoinType.FULL_JOIN;
-                        parseJoin(type);
+                        table = parseJoin(type);
                         break;
                     case ",":
                         type = Join.JoinType.IMPLICIT_JOIN;
-                        parseJoin(type);
+                        if (nextLexeme().equals("(")) {
+                            table = parseSubq();
+                        } else {
+                            table = parseJoin(type);
+                        }
                         break;
                 }
-            } while(!(lexeme1 = nextLexeme()).equals("where"));
+                if (table != null) {
+                    sources.add(table);
+                }
+                lexeme1 = nextLexeme();
+            }
             pos--;
         } catch (QueryException e) {
             e.getError();
@@ -210,15 +226,6 @@ public class LexParser {
         Table table = null;
         try {
             String lexeme1 = nextLexeme();
-            /*if (lexeme1.equals("(")) {
-                if (nextLexeme().equals("select")) {
-                    pos--;
-                    Query subQuery = new Query();
-                    parseQuery(subQuery);
-                    table = new Subquery(subQuery);
-                    return table;
-                }
-            }*/
             String lexeme2 = nextLexeme();
             if (lexeme2.equals("as")) {
                 lexeme2 = nextLexeme();

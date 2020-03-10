@@ -44,7 +44,7 @@ public class Join extends QueryItem{
     public String print(String pad) {
         String res = pad + "join: " + "\n";
         pad = pad + "\t";
-        res = rTable.print(pad) + "\n";
+        res = res + rTable.print(pad) + "\n";
         res = res + pad + "type: " + join.name();
         if (join != JoinType.IMPLICIT_JOIN) {
             res = res + "\n" + pad + "on: " + lTableCol.print(pad)+ "\n";
