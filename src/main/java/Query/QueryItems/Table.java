@@ -1,11 +1,9 @@
 package Query.QueryItems;
 
-import Query.Query;
 
-public class Table {
+public class Table extends QueryItem {
     private String name;
-    private String alias =  "";
-    private Query subQuery = null;
+    private String alias = null;
 
     public Table(String name) {
         this.name = name;
@@ -16,11 +14,13 @@ public class Table {
         this.alias = alias;
     }
 
-    public Table(Query q) {
-        this.subQuery = q;
-    }
-
-    public String getString() {
-        return "Table: " + name + alias;
+    public String print(String pad) {
+        String res = pad +  "table:\n";
+        pad = pad + "\t";
+        if (alias == null) {
+            return res + pad + "name: " + name;
+        } else {
+            return res + pad + "name: " + name + "\n" + pad + "alias: " + alias;
+        }
     }
 }

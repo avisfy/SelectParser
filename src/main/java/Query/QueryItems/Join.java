@@ -2,7 +2,7 @@ package Query.QueryItems;
 
 import Query.QueryException;
 
-public class Join {
+public class Join extends QueryItem{
     public enum JoinType {
         INNER_JOIN(0),
         LEFT_JOIN(1),
@@ -16,12 +16,11 @@ public class Join {
             this.joinType = join;
         }
     }
-
+    private static final String JOIN_EXCEPTION = "JOIN_EXCEPTION";
     private Table rTable = null;
     private JoinType join = null;
-    private ColumnItem rTableCol = null;
-    private ColumnItem lTableCol = null;
-    private static final String JOIN_EXCEPTION = "JOIN_EXCEPTION";
+    private Column rTableCol = null;
+    private Column lTableCol = null;
 
     //for implicit join
     public Join(JoinType type, Table table) throws QueryException {
@@ -32,7 +31,7 @@ public class Join {
         join = type;
     }
 
-    public Join(JoinType type, Table table, ColumnItem col1, ColumnItem col2) throws QueryException {
+    public Join(JoinType type, Table table, Column col1, Column col2) throws QueryException {
         if (type == JoinType.IMPLICIT_JOIN){
             throw new QueryException(JOIN_EXCEPTION, "Attempt implicitly join tables with columns");
         }
@@ -42,28 +41,16 @@ public class Join {
         lTableCol = col2;
     }
 
-    public String getString() {
-        String joinStr;
-        switch (join) {
-            case INNER_JOIN:
-                joinStr = "INNER JOIN";
-                break;
-            case LEFT_JOIN:
-                joinStr = "LEFT JOIN";
-                break;
-            case RIGHT_JOIN:
-                joinStr = "RIGHT JOIN";
-                break;
-            case FULL_JOIN:
-                joinStr = "FULL JOIN";
-                break;
-            case IMPLICIT_JOIN:
-                joinStr = "";
-                return "Join: " + " " + rTable + " " + joinStr;
-            default:
-                return "";
+    public String print(String pad) {
+        String res = pad + "join: " + "\n";
+        pad = pad + "\t";
+        res = rTable.print(pad) + "\n";
+        res = res + pad + "type: " + join.name();
+        if (join != JoinType.IMPLICIT_JOIN) {
+            res = res + "\n" + pad + "on: " + lTableCol.print(pad)+ "\n";
+            res = res + pad + "   " + lTableCol.print(pad)+ "\n";
         }
-        return "Join: " + " " + rTable + " " + joinStr;
+        return res;
     }
 
 }

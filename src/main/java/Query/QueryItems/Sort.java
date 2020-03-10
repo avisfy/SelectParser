@@ -3,19 +3,19 @@ package Query.QueryItems;
 public class Sort {
     static final int ASC = 1;
     static final int DESC = -1;
-    ColumnItem column;
+    Column column;
     int sortType;
 
-    Sort(ColumnItem col, int type) {
+    Sort(Column col, int type) {
         this.column = col;
         this.sortType = type;
     }
 
-    public String getString() {
+    public String print(String pad) {
         if (sortType == 1) {
-            return "Sort: " + column.getString() + "ascending";
+            return "sort: " + column.print(pad) + "ascending";
         } else if (sortType == -1) {
-            return "Sort: " + column.getString() + "descending";
+            return "sort: " + column.print(pad) + "descending";
         } else
             return "";
     }

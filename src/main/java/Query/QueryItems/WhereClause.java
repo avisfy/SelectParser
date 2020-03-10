@@ -18,45 +18,18 @@ public class WhereClause {
         }
     }
 
-    private ColumnItem column1;
+    private Column column1;
     private OperatorType operator;
-    private ColumnItem columnItem2 = null;
-    //private Query subQuery = null; //for IN and NOT IN
-    private Integer numberInt  = null;
-    private Float numberFloat  = null;
+    private QueryItem item = null;
 
-    WhereClause(ColumnItem col1, OperatorType operator, ColumnItem col2) {
+    WhereClause(Column col1, OperatorType operator, QueryItem col2) {
         column1 = col1;
         this.operator = operator;
-        columnItem2 = col2;
-    }
-
-    WhereClause(ColumnItem col1, OperatorType operator, int number) {
-        column1 = col1;
-        this.operator = operator;
-        columnItem2 = null;
-        numberInt = number;
-        numberFloat = null;
-    }
-
-    WhereClause(ColumnItem col1, OperatorType operator, float number) {
-        column1 = col1;
-        this.operator = operator;
-        columnItem2 = null;
-        numberInt = null;
-        numberFloat = number;
+        item = col2;
     }
 
     public String getString() throws QueryException {
-        if (columnItem2 != null ) {
-            return "WhereClause: " + column1.getString() + " " + operator.name() + " " + columnItem2.getString();
-        } else if (numberInt != null) {
-            return "WhereClause: " + column1.getString() + " " + operator.name() + " " + numberInt;
-        } else if (numberFloat != null) {
-            return "WhereClause: " + column1.getString() + " " + operator.name() + " " + numberFloat;
-        } else {
-            return "";
-        }
+        return "whereClause: " + column1.print(" ") + " " + operator.name() + " " + item.print(" ");
     }
 }
 

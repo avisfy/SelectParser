@@ -17,7 +17,7 @@ public class Main {
         }
         try {
             Query q = new Query(input);
-            System.out.println(q.getString());
+            System.out.println(q.print(""));
         } catch (QueryException e) {
             System.out.println(e.getError());
         }

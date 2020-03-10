@@ -6,10 +6,10 @@ import Query.QueryItems.*;
 import java.util.List;
 
 public class Query {
-    private List<ColumnItem> selectItems = null;
-    private List<Source> fromSources  = null;
+    private List<QueryItem> selectItems = null;
+    private List<QueryItem> fromSources  = null;
     private List<WhereClause> whereClauses = null;
-    private List<ColumnItem> groupByColumns = null;
+    private List<Column> groupByColumns = null;
     private List<Sort> sortColumns = null;
     private Integer limit = null;
     private Integer offset = null;
@@ -25,13 +25,13 @@ public class Query {
 
     public Query() {}
 
-    public void setSelectItems(List<ColumnItem> selectItems) {
+    public void setSelectItems(List<QueryItem> selectItems) {
         if (!selectItems.isEmpty()) {
             this.selectItems = selectItems;
         }
     }
 
-    public void setFromSources(List<Source> fromSources) {
+    public void setFromSources(List<QueryItem> fromSources) {
         this.fromSources = fromSources;
     }
 
@@ -39,7 +39,7 @@ public class Query {
         this.whereClauses = whereClauses;
     }
 
-    public void setGroupByColumns(List<ColumnItem> groupByColumns) {
+    public void setGroupByColumns(List<Column> groupByColumns) {
         this.groupByColumns = groupByColumns;
     }
 
@@ -56,54 +56,55 @@ public class Query {
     }
 
 
-    public String getString() throws QueryException{
+    public String print(String pad) throws QueryException{
         StringBuffer strResult;
+        pad = pad + "\t";
         if (selectItems != null) {
-            strResult = new StringBuffer("SELECT:\n");
-            for (ColumnItem columnItem : selectItems) {
-                strResult.append(columnItem.getString() + " ");
+            strResult = new StringBuffer(pad + "SELECT:\n");
+            for (QueryItem columnItem : selectItems) {
+                strResult.append(columnItem.print(pad) + "\n");
             }
             strResult.append("\n");
         } else {
             throw new QueryException(QUERY_EXCEPTION, "Select statement not found");
         }
         if (fromSources != null) {
-            strResult.append("FROM:\n");
-            for (Source source: fromSources) {
-                strResult.append(source.getString() + " ");
+            strResult.append(pad + "FROM:\n");
+            for (QueryItem source: fromSources) {
+                strResult.append(source.print(pad) + "\n");
             }
             strResult.append("\n");
         } //else {
             //throw new QueryException(QUERY_EXCEPTION, "From statement not found");
         //}
         if (whereClauses != null) {
-            strResult.append("WHERE:\n");
+            strResult.append(pad + "WHERE:\n");
             for (WhereClause where: whereClauses) {
                 strResult.append(where.getString() + " ");
             }
             strResult.append("\n");
         }
         if (groupByColumns != null) {
-            strResult.append("GROUP BY:\n");
-            for (ColumnItem group: groupByColumns) {
-                strResult.append(group.getString() + " ");
+            strResult.append(pad + "GROUP BY:\n");
+            for (Column group: groupByColumns) {
+                strResult.append(group.print("\t") + " ");
             }
             strResult.append("\n");
         }
         if (sortColumns != null) {
-            strResult.append("ORDER BY:\n");
+            strResult.append(pad + "ORDER BY:\n");
             for (Sort sort: sortColumns) {
-                strResult.append(sort.getString() + " ");
+                strResult.append(sort.print("\t") + " ");
             }
             strResult.append("\n");
         }
         if (limit != null) {
-            strResult.append("LIMIT:\n");
+            strResult.append(pad + "LIMIT:\n");
             strResult.append(limit.toString());
             strResult.append("\n");
         }
         if (offset != null) {
-            strResult.append("LIMIT:\n");
+            strResult.append(pad + "LIMIT:\n");
             strResult.append(offset.toString());
             strResult.append("\n");
         }
