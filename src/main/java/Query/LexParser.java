@@ -20,7 +20,7 @@ public class LexParser {
 
         while ((pos < input.length()) && (input.charAt(pos) != ';')) {
             if (!Character.isWhitespace(input.charAt(pos))) {
-                if ((input.charAt(pos) == '(') || (input.charAt(pos) == ')') || (input.charAt(pos) == ',') || (input.charAt(pos) == '.')) {
+                if ((input.charAt(pos) == '(') || (input.charAt(pos) == ')') || (input.charAt(pos) == '\'') || (input.charAt(pos) == ',') || (input.charAt(pos) == '.')) {
                     //if buffer contains lexemes, add it
                     addLexeme();
                     lexemes.add(String.valueOf(input.charAt(pos)));
@@ -98,8 +98,19 @@ public class LexParser {
                     case "(":
                         column = parseSubq();
                         break;
+                    case "'":
+                        pos--;
+                        column = parsePrim();
+                        break;
                     default:
-                        column = parseColumn(lexeme);
+                        //case primitive number
+                        if (Character.isDigit(lexeme.charAt(0))) {
+                            pos--;
+                            column = parsePrim();
+                        } else{
+                            column = parseColumn(lexeme);
+                        }
+
                 }
                 if (column != null) {
                     selectItems.add(column);
@@ -332,6 +343,42 @@ public class LexParser {
         return column;
     }
 
+    private Primitive parsePrim() {
+        String lexeme = "";
+        Primitive prim = null;
+        try {
+            lexeme = nextLexeme();
+            //case string primitive
+            if (lexeme.equals("'")) {
+                lexeme = nextLexeme();
+                prim = new Primitive(lexeme);
+                //skip '
+                nextLexeme();
+            } else {
+                //case float primitive
+                if (lexeme.indexOf(".") != -1) {
+                    Double number = Double.valueOf(lexeme);
+                    prim = new Primitive(number);
+                } else {
+                    Integer number = Integer.valueOf(lexeme);
+                    prim = new Primitive(number);
+                }
+            }
+            lexeme = nextLexeme();
+            if (lexeme.equals("as")) {
+                lexeme = nextLexeme();
+                prim.setAlias(lexeme);
+            } else {
+                pos--;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            prim = null;
+        } catch (QueryException e) {
+            e.getError();
+        }
+        return prim;
+    }
 
     private String nextLexeme() throws QueryException {
         if (pos < lexemes.size()) {
