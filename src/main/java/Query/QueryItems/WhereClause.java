@@ -1,9 +1,7 @@
 package Query.QueryItems;
 
-import Query.QueryException;
-
-public class WhereClause {
-    enum OperatorType {
+public class WhereClause extends QueryItem{
+    public enum OperatorType {
         EQUAL("="),
         NOT_EQUAL("<>"),
         MORE(">"),
@@ -21,18 +19,19 @@ public class WhereClause {
         }
     }
 
-    private Column column1;
+    private Column column;
     private OperatorType operator;
-    private QueryItem item = null;
+    private QueryItem item;
 
-    WhereClause(Column col1, OperatorType operator, QueryItem col2) {
-        column1 = col1;
+    public WhereClause(Column col1, OperatorType operator, QueryItem col2) {
+        column = col1;
         this.operator = operator;
         item = col2;
     }
 
-    public String getString() throws QueryException {
-        return "whereClause: " + column1.print(" ") + " " + operator.name() + " " + item.print(" ");
+    public String print(String pad) {
+        String newpad =  pad + "\t";
+        return newpad + "col1: " + column.print(newpad) + " \n" + newpad + "operator: " + operator.name() + newpad + "col1: " + item.print(newpad);
     }
 }
 

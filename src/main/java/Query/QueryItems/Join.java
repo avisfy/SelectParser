@@ -48,7 +48,7 @@ public class Join extends QueryItem {
         res = res + rTable.print(pad) + "\n";
         res = res + pad + "type: " + join.name();
         if (join != JoinType.IMPLICIT_JOIN) {
-            res = res + "\n" + pad + "on: " + lTableCol.print(pad) + "\n";
+            res = res + "\n" + pad + "on:\n" + lTableCol.print(pad) + "\n";
             res = res + pad + "   " + rTableCol.print(pad) + "\n";
         }
         return res;

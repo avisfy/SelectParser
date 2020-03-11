@@ -33,11 +33,15 @@ public class Query {
     }
 
     public void setFromSources(List<QueryItem> fromSources) {
-        this.fromSources = fromSources;
+        if (!fromSources.isEmpty()) {
+            this.fromSources = fromSources;
+        }
     }
 
     public void setWhereClauses(List<WhereClause> whereClauses) {
-        this.whereClauses = whereClauses;
+        if (!whereClauses.isEmpty()) {
+            this.whereClauses = whereClauses;
+        }
     }
 
     public void setGroupByColumns(List<Column> groupByColumns) {
@@ -75,13 +79,13 @@ public class Query {
                 strResult.append(source.print(pad) + "\n");
             }
             strResult.append("\n");
-        } //else {
-        //throw new QueryException(QUERY_EXCEPTION, "From statement not found");
-        //}
+        } else {
+        throw new QueryException(QUERY_EXCEPTION, "From statement not found");
+        }
         if (whereClauses != null) {
             strResult.append(pad + "WHERE:\n");
             for (WhereClause where : whereClauses) {
-                strResult.append(where.getString() + " ");
+                strResult.append(where.print(pad) + " ");
             }
             strResult.append("\n");
         }

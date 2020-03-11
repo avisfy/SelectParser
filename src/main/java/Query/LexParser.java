@@ -36,6 +36,8 @@ public class LexParser {
                         pos--;
                         addLexeme();
                     }
+                } else {
+                    buf.append(input.charAt(pos));
                 }
             } else {
                 addLexeme();
@@ -55,12 +57,13 @@ public class LexParser {
                 if (lexeme.equals("select")) {
                     q.setSelectItems(parseSelect());
                     System.out.println("Select");
-                    lexeme = nextLexeme();
-                }
-                System.out.println(pos);
-                if (lexeme.equals("from")) {
+                } else if (lexeme.equals("from")) {
                     q.setFromSources(parseFrom());
+                    System.out.println("eeee " + pos);
                     System.out.println("From");
+                } else if (lexeme.equals("where")) {
+                    q.setWhereClauses(parseWhere());
+                    System.out.println("Where");
                     //lexeme = nextLexeme();
                 }
             }
@@ -109,18 +112,15 @@ public class LexParser {
                         column = parseSubq();
                         break;
                     case "'":
-                        pos--;
                         column = parsePrim();
                         break;
                     default:
                         //case primitive number
                         if (Character.isDigit(lexeme.charAt(0))) {
-                            pos--;
                             column = parsePrim();
                         } else{
                             column = parseColumn(lexeme);
                         }
-
                 }
                 if (column != null) {
                     selectItems.add(column);
@@ -190,6 +190,71 @@ public class LexParser {
         return sources;
     }
 
+    private List<WhereClause> parseWhere() {
+        List<WhereClause> where = null;
+        try {
+            String lexeme;
+            Column operand1 = null;
+            QueryItem operand2 = null;
+            WhereClause.OperatorType operator;
+            where = new ArrayList<>();
+            //pos--;
+            do {
+                operator = null;
+                //nextLexeme();
+                lexeme = nextLexeme();
+                operand1 = parseColumn(lexeme);
+                lexeme = nextLexeme();
+                switch (lexeme) {
+                    case "=":
+                        operator = WhereClause.OperatorType.EQUAL;
+                        break;
+                    case ">":
+                        operator = WhereClause.OperatorType.MORE;
+                        break;
+                    case ">=":
+                        operator = WhereClause.OperatorType.MORE_OR_EQUAL;
+                        break;
+                    case "<":
+                        operator = WhereClause.OperatorType.LESS;;
+                        break;
+                    case "<=":
+                        operator = WhereClause.OperatorType.LESS_OR_EQUAL;;
+                        break;
+                    case "<>":
+                        operator = WhereClause.OperatorType.NOT_EQUAL;
+                        break;
+                    case "in":
+                        operator = WhereClause.OperatorType.IN;
+                        break;
+                    case "not":
+                        if (nextLexeme().equals("in")) {
+                            operator = WhereClause.OperatorType.NOT_IN;
+                        } else throw new QueryException(LEXEMES_EXCEPTION, "Error operator");
+                        break;
+                    case "like":
+                        operator = WhereClause.OperatorType.LIKE;
+                        break;
+                }
+                lexeme = nextLexeme();
+                if (Character.isDigit(lexeme.charAt(0)) || lexeme.equals("'")) {
+                    operand2 = parsePrim();
+                } else if (lexeme.equals("(")) {
+                    operand2 =  parseSubq();
+                }
+                else {
+                    operand2 = parseColumn(lexeme);
+                }
+                if (operator != null) {
+                    where.add(new WhereClause(operand1, operator, operand2));
+                }
+            } while ((lexeme = nextLexeme()).equals("and") || lexeme.equals("or"));
+        } catch (QueryException e) {
+            e.getError();
+        }
+        pos--;
+        return where;
+    }
 
     private Join parseJoin(Join.JoinType type) {
         Join join = null;
@@ -356,6 +421,7 @@ public class LexParser {
     private Primitive parsePrim() {
         String lexeme = "";
         Primitive prim = null;
+        pos--;
         try {
             lexeme = nextLexeme();
             //case string primitive
