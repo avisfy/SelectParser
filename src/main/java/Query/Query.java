@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Query {
     private List<QueryItem> selectItems = null;
-    private List<QueryItem> fromSources  = null;
+    private List<QueryItem> fromSources = null;
     private List<WhereClause> whereClauses = null;
     private List<Column> groupByColumns = null;
     private List<Sort> sortColumns = null;
@@ -23,7 +23,8 @@ public class Query {
         parser.parseQuery(this);
     }
 
-    public Query() {}
+    public Query() {
+    }
 
     public void setSelectItems(List<QueryItem> selectItems) {
         if (!selectItems.isEmpty()) {
@@ -56,7 +57,7 @@ public class Query {
     }
 
 
-    public String print(String pad) throws QueryException{
+    public String print(String pad) throws QueryException {
         StringBuffer strResult;
         pad = pad + "\t";
         if (selectItems != null) {
@@ -70,30 +71,30 @@ public class Query {
         }
         if (fromSources != null) {
             strResult.append(pad + "FROM:\n");
-            for (QueryItem source: fromSources) {
+            for (QueryItem source : fromSources) {
                 strResult.append(source.print(pad) + "\n");
             }
             strResult.append("\n");
         } //else {
-            //throw new QueryException(QUERY_EXCEPTION, "From statement not found");
+        //throw new QueryException(QUERY_EXCEPTION, "From statement not found");
         //}
         if (whereClauses != null) {
             strResult.append(pad + "WHERE:\n");
-            for (WhereClause where: whereClauses) {
+            for (WhereClause where : whereClauses) {
                 strResult.append(where.getString() + " ");
             }
             strResult.append("\n");
         }
         if (groupByColumns != null) {
             strResult.append(pad + "GROUP BY:\n");
-            for (Column group: groupByColumns) {
+            for (Column group : groupByColumns) {
                 strResult.append(group.print("\t") + " ");
             }
             strResult.append("\n");
         }
         if (sortColumns != null) {
             strResult.append(pad + "ORDER BY:\n");
-            for (Sort sort: sortColumns) {
+            for (Sort sort : sortColumns) {
                 strResult.append(sort.print("\t") + " ");
             }
             strResult.append("\n");

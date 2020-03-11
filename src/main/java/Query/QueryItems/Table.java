@@ -15,7 +15,7 @@ public class Table extends QueryItem {
     }
 
     public String print(String pad) {
-        String res = pad +  "table:\n";
+        String res = pad + "table:\n";
         pad = pad + "\t";
         if (alias == null) {
             return res + pad + "name: " + name;

@@ -1,7 +1,7 @@
 package Query.QueryItems;
 
 public class Column extends QueryItem {
-    private Table source =  null;
+    private Table source = null;
     private String name = null;
     private String alias = null;
     private boolean isAll = false;
@@ -15,7 +15,7 @@ public class Column extends QueryItem {
             this.name = name1;
         }
         this.alias = alias;
-       isAll = false;
+        isAll = false;
     }
 
     //column without alias
@@ -44,7 +44,7 @@ public class Column extends QueryItem {
         }
         res = res + pad + "name: " + name;
         if (alias != null) {
-            res = res + "\n" + pad + "alias: "  + alias;
+            res = res + "\n" + pad + "alias: " + alias;
         }
         return res;
     }

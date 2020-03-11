@@ -6,6 +6,7 @@ public class FunctionColumn extends QueryItem {
     public enum Functions {
         MIN, MAX, AVG, COUNT, SUM
     }
+
     private Column column;
     private Functions function = null;
     private String alias;
@@ -27,7 +28,7 @@ public class FunctionColumn extends QueryItem {
         pad = pad + "\t";
         res = res + pad + "fun: " + function.name() + "\n" + column.print(pad);
         if (alias != null) {
-            res = res +  "\n" + pad +  "alias: " + alias;
+            res = res + "\n" + pad + "alias: " + alias;
         }
         return res;
     }

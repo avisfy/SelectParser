@@ -2,7 +2,7 @@ package Query.QueryItems;
 
 import Query.QueryException;
 
-public class Join extends QueryItem{
+public class Join extends QueryItem {
     public enum JoinType {
         INNER_JOIN(0),
         LEFT_JOIN(1),
@@ -16,6 +16,7 @@ public class Join extends QueryItem{
             this.joinType = join;
         }
     }
+
     private static final String JOIN_EXCEPTION = "JOIN_EXCEPTION";
     private Table rTable = null;
     private JoinType join = null;
@@ -24,7 +25,7 @@ public class Join extends QueryItem{
 
     //for implicit join
     public Join(JoinType type, Table table) throws QueryException {
-        if (type != JoinType.IMPLICIT_JOIN){
+        if (type != JoinType.IMPLICIT_JOIN) {
             throw new QueryException(JOIN_EXCEPTION, "Attempt not implicitly join tables without columns");
         }
         rTable = table;
@@ -32,13 +33,13 @@ public class Join extends QueryItem{
     }
 
     public Join(JoinType type, Table table, Column col1, Column col2) throws QueryException {
-        if (type == JoinType.IMPLICIT_JOIN){
+        if (type == JoinType.IMPLICIT_JOIN) {
             throw new QueryException(JOIN_EXCEPTION, "Attempt implicitly join tables with columns");
         }
         rTable = table;
         join = type;
-        rTableCol = col1;
-        lTableCol = col2;
+        lTableCol = col1;
+        rTableCol = col2;
     }
 
     public String print(String pad) {
@@ -47,8 +48,8 @@ public class Join extends QueryItem{
         res = res + rTable.print(pad) + "\n";
         res = res + pad + "type: " + join.name();
         if (join != JoinType.IMPLICIT_JOIN) {
-            res = res + "\n" + pad + "on: " + lTableCol.print(pad)+ "\n";
-            res = res + pad + "   " + lTableCol.print(pad)+ "\n";
+            res = res + "\n" + pad + "on: " + lTableCol.print(pad) + "\n";
+            res = res + pad + "   " + rTableCol.print(pad) + "\n";
         }
         return res;
     }
