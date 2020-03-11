@@ -118,7 +118,7 @@ public class LexParser {
                         if (Character.isDigit(lexeme.charAt(0))) {
                             column = parsePrim();
                         } else{
-                            column = parseColumn(lexeme);
+                            column = parseColumn();
                         }
                 }
                 if (column != null) {
@@ -204,7 +204,7 @@ public class LexParser {
                 operator = null;
                 whereItem = null;
                 lexeme = nextLexeme();
-                operand1 = parseColumn(lexeme);
+                operand1 = parseColumn();
                 lexeme = nextLexeme();
                 switch (lexeme) {
                     case "=":
@@ -244,7 +244,7 @@ public class LexParser {
                     operand2 =  parseSubq();
                 }
                 else {
-                    operand2 = parseColumn(lexeme);
+                    operand2 = parseColumn();
                 }
                 if (operator != null) {
                     whereItem = new WhereClause(operand1, operator, operand2);
@@ -291,10 +291,12 @@ public class LexParser {
                 pos--;
                 isBrackets = false;
             }
-            Column column1 = parseColumn(nextLexeme());
+            nextLexeme();
+            Column column1 = parseColumn();
             //skip "="
             nextLexeme();
-            Column column2 = parseColumn(nextLexeme());
+            nextLexeme();
+            Column column2 = parseColumn();
             join = new Join(type, joinedTable, column1, column2);
             //if join condition in brackets, skip ")"
             if (isBrackets)
@@ -357,13 +359,19 @@ public class LexParser {
     }
 
 
-    private Column parseColumn(String lexeme) {
+    private Column parseColumn() {
         Column column = null;
-        String str1 = lexeme;
+        String lexeme;
+        String str1 = "";
         String str2 = "";
         String str3 = "";
+        pos--;
         try {
-            str1 = lexeme;
+        lexeme = nextLexeme();
+        str1 = lexeme;
+        str2 = "";
+        str3 = "";
+
             str2 = nextLexeme();
             if (str2.equals(".")) {
                 //means that str1 - table name, str2 - column name
