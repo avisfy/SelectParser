@@ -15,12 +15,12 @@ public class Table extends QueryItem {
     }
 
     public String print(String pad) {
-        String res = pad + "table:\n";
+        String res = pad + "tab: " + name;
         pad = pad + "\t";
         if (alias == null) {
-            return res + pad + "name: " + name;
+            return res;
         } else {
-            return res + pad + "name: " + name + "\n" + pad + "alias: " + alias;
+            return res + "\n" + pad +  "alias: " + alias;
         }
     }
 }

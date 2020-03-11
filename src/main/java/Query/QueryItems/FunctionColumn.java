@@ -24,7 +24,7 @@ public class FunctionColumn extends QueryItem {
     }
 
     public String print(String pad) {
-        String res = pad + "col:\n";
+        String res = pad + "funcol:\n";
         pad = pad + "\t";
         res = res + pad + "fun: " + function.name() + "\n" + column.print(pad);
         if (alias != null) {

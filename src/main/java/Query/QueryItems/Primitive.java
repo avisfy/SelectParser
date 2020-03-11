@@ -14,9 +14,9 @@ public class Primitive extends QueryItem {
 
     public String print(String pad) {
         if (alias != null) {
-            return pad + "prim:\n" + pad + "\tvalue: " + primObj.toString() + "\n" + pad + "\talias: " + alias;
+            return pad + "prim: " + primObj.toString() + "\n" + pad + "\talias: " + alias;
         } else {
-            return pad + "prim:\n" + pad + "\tvalue: " + primObj.toString();
+            return pad + "prim: " + primObj.toString();
         }
     }
 

@@ -192,16 +192,18 @@ public class LexParser {
 
     private List<WhereClause> parseWhere() {
         List<WhereClause> where = null;
+        WhereClause whereItem = null;
         try {
             String lexeme;
             Column operand1 = null;
             QueryItem operand2 = null;
             WhereClause.OperatorType operator;
             where = new ArrayList<>();
-            //pos--;
+            //no AND or OR lexeme after where clause means end of where;
+            boolean isEnd = false;
             do {
                 operator = null;
-                //nextLexeme();
+                whereItem = null;
                 lexeme = nextLexeme();
                 operand1 = parseColumn(lexeme);
                 lexeme = nextLexeme();
@@ -246,10 +248,24 @@ public class LexParser {
                     operand2 = parseColumn(lexeme);
                 }
                 if (operator != null) {
-                    where.add(new WhereClause(operand1, operator, operand2));
+                    whereItem = new WhereClause(operand1, operator, operand2);
+                    lexeme = nextLexeme();
+                    if (lexeme.equals("and")) {
+                        whereItem.setNext(WhereClause.ConnectionType.AND);
+                    } else if (lexeme.equals("or")){
+                        whereItem.setNext(WhereClause.ConnectionType.OR);
+                    } else {
+                        where.add(whereItem);
+                        isEnd = true;
+                    }
+                    where.add(whereItem);
                 }
-            } while ((lexeme = nextLexeme()).equals("and") || lexeme.equals("or"));
+            } while (!isEnd);
         } catch (QueryException e) {
+            //if end of query but last where clause not saved
+            if (whereItem != null) {
+                where.add(whereItem);
+            }
             e.getError();
         }
         pos--;

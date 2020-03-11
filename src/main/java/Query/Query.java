@@ -63,55 +63,48 @@ public class Query {
 
     public String print(String pad) throws QueryException {
         StringBuffer strResult;
-        pad = pad + "\t";
+        String newPad = pad + "\t";
         if (selectItems != null) {
             strResult = new StringBuffer(pad + "SELECT:\n");
             for (QueryItem columnItem : selectItems) {
-                strResult.append(columnItem.print(pad) + "\n");
+                strResult.append(columnItem.print(newPad) + "\n");
             }
-            strResult.append("\n");
         } else {
             throw new QueryException(QUERY_EXCEPTION, "Select statement not found");
         }
         if (fromSources != null) {
             strResult.append(pad + "FROM:\n");
             for (QueryItem source : fromSources) {
-                strResult.append(source.print(pad) + "\n");
+                strResult.append(source.print(newPad) + "\n");
             }
-            strResult.append("\n");
         } else {
         throw new QueryException(QUERY_EXCEPTION, "From statement not found");
         }
         if (whereClauses != null) {
             strResult.append(pad + "WHERE:\n");
             for (WhereClause where : whereClauses) {
-                strResult.append(where.print(pad) + " ");
+                strResult.append(where.print(newPad) + "\n");
             }
-            strResult.append("\n");
         }
         if (groupByColumns != null) {
             strResult.append(pad + "GROUP BY:\n");
             for (Column group : groupByColumns) {
-                strResult.append(group.print("\t") + " ");
+                strResult.append(group.print(newPad) + "\n");
             }
-            strResult.append("\n");
         }
         if (sortColumns != null) {
             strResult.append(pad + "ORDER BY:\n");
             for (Sort sort : sortColumns) {
-                strResult.append(sort.print("\t") + " ");
+                strResult.append(sort.print(newPad) + "\n");
             }
-            strResult.append("\n");
         }
         if (limit != null) {
             strResult.append(pad + "LIMIT:\n");
-            strResult.append(limit.toString());
-            strResult.append("\n");
+            strResult.append(newPad + limit.toString());
         }
         if (offset != null) {
             strResult.append(pad + "LIMIT:\n");
-            strResult.append(offset.toString());
-            strResult.append("\n");
+            strResult.append(newPad + offset.toString());
         }
         return strResult.toString();
     }

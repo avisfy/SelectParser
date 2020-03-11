@@ -19,9 +19,16 @@ public class WhereClause extends QueryItem{
         }
     }
 
+    //connection type for next where clause
+    public enum ConnectionType {
+        AND,
+        OR
+    }
+
     private Column column;
     private OperatorType operator;
     private QueryItem item;
+    private ConnectionType next = null;
 
     public WhereClause(Column col1, OperatorType operator, QueryItem col2) {
         column = col1;
@@ -29,11 +36,20 @@ public class WhereClause extends QueryItem{
         item = col2;
     }
 
+    public void setNext(ConnectionType next) {
+        this.next = next;
+    }
+
     public String print(String pad) {
         String newpad =  pad + "\t";
-        return newpad + "col1: " + column.print(newpad) + " \n" + newpad + "operator: " + operator.name() + newpad + "col1: " + item.print(newpad);
+        String res = column.print(newpad) + " \n" + newpad + "operator: " + operator.name() + "\n" +  item.print(newpad);
+        if (next != null) {
+            res =  res + "\n" + pad + next.name();
+        }
+        return res;
     }
 }
+
 
 
 

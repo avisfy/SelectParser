@@ -35,16 +35,16 @@ public class Column extends QueryItem {
     }
 
     public String print(String pad) {
+        String newPad = pad + "\t";
         String res = pad + "col:\n";
-        pad = pad + "\t";
         if (isAll)
-            return res + pad + "*";
+            return res + newPad + "*";
         if (source != null) {
-            res = res + source.print(pad) + "\n";
+            res = res + source.print(newPad) + "\n";
         }
-        res = res + pad + "name: " + name;
+        res = res + newPad + "colname: " + name;
         if (alias != null) {
-            res = res + "\n" + pad + "alias: " + alias;
+            res = res + "\n" + newPad + "alias: " + alias;
         }
         return res;
     }

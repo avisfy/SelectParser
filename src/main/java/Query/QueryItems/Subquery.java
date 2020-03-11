@@ -20,9 +20,9 @@ public class Subquery extends QueryItem {
         String res = pad + "sub:\n";
         pad = pad + "\t";
         try {
-            res = res + subquery.print(pad) + "\n";
+            res = res + subquery.print(pad);
             if (alias != null) {
-                res = res + pad + "alias: " + alias + "\n";
+                res = res + "\n" + pad + "alias: " + alias;
             }
         } catch (QueryException e) {
             e.getError();
