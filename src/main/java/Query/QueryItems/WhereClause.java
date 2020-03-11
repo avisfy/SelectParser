@@ -9,7 +9,10 @@ public class WhereClause {
         MORE(">"),
         LESS("<"),
         MORE_OR_EQUAL(">="),
-        LESS_OR_EQUAL("<=");
+        LESS_OR_EQUAL("<="),
+        IN("IN"),
+        NOT_IN("NOT IN"),
+        LIKE("LIKE");
 
         private String operator;
 

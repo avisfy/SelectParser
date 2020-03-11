@@ -24,8 +24,18 @@ public class LexParser {
                     //if buffer contains lexemes, add it
                     addLexeme();
                     lexemes.add(String.valueOf(input.charAt(pos)));
-                } else {
+                } //parse operators like =, <=, <>, ...
+                else if ((input.charAt(pos) == '<') || (input.charAt(pos) == '>') || (input.charAt(pos) == '=')) {
+                    addLexeme();
                     buf.append(input.charAt(pos));
+                    pos++;
+                    //if operator includes 2 characters
+                    if ((input.charAt(pos) == '<') || (input.charAt(pos) == '>') || (input.charAt(pos) == '=')) {
+                        buf.append(input.charAt(pos));
+                    } else {
+                        pos--;
+                        addLexeme();
+                    }
                 }
             } else {
                 addLexeme();
