@@ -56,14 +56,13 @@ public class LexParser {
             while (!(lexeme = nextLexeme()).equals(")")) {
                 if (lexeme.equals("select")) {
                     q.setSelectItems(parseSelect());
-                    System.out.println("Select");
+                    //System.out.println("Select");
                 } else if (lexeme.equals("from")) {
                     q.setFromSources(parseFrom());
-                    System.out.println("eeee " + pos);
-                    System.out.println("From");
+                    //System.out.println("From");
                 } else if (lexeme.equals("where")) {
                     q.setWhereClauses(parseWhere());
-                    System.out.println("Where");
+                    //System.out.println("Where");
                     //lexeme = nextLexeme();
                 }
             }
@@ -485,6 +484,7 @@ public class LexParser {
         for (String lexeme : lexemes) {
             System.out.println(lexeme);
         }
+        System.out.println();
     }
 
 

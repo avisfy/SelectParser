@@ -19,7 +19,7 @@ public class Query {
     public Query(String strQuery) throws QueryException {
         strQuery = strQuery.toLowerCase();
         parser = new LexParser(strQuery);
-        parser.printLexemes();
+        //parser.printLexemes();
         parser.parseQuery(this);
     }
 
