@@ -27,31 +27,33 @@ public class Query {
     }
 
     public void setSelectItems(List<QueryItem> selectItems) {
-        if (!selectItems.isEmpty()) {
+        if (selectItems != null) {
             this.selectItems = selectItems;
         }
     }
 
     public void setFromSources(List<QueryItem> fromSources) {
-        if (!fromSources.isEmpty()) {
+        if (fromSources != null) {
             this.fromSources = fromSources;
         }
     }
 
     public void setWhereClauses(List<WhereClause> whereClauses) {
-        if (!whereClauses.isEmpty()) {
+        if (whereClauses != null) {
             this.whereClauses = whereClauses;
         }
     }
 
     public void setGroupByColumns(List<Column> groupByColumns) {
-        if (!groupByColumns.isEmpty()) {
+        if (groupByColumns != null) {
             this.groupByColumns = groupByColumns;
         }
     }
 
     public void setSortColumns(List<Sort> sortColumns) {
-        this.sortColumns = sortColumns;
+        if (sortColumns != null) {
+            this.sortColumns = sortColumns;
+        }
     }
 
     public void setLimit(Integer limit) {

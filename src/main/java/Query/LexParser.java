@@ -68,6 +68,11 @@ public class LexParser {
                         q.setGroupByColumns(parseGroupBy());
                         //System.out.println("Where");
                     }
+                } else if (lexeme.equals("order")) {
+                    if (nextLexeme().equals("by")) {
+                        q.setSortColumns(parseOrderBy());
+                        //System.out.println("Where");
+                    }
                 }
 
                 }
@@ -279,21 +284,54 @@ public class LexParser {
     private List<Column> parseGroupBy() {
         ArrayList<Column> group = null;
         try {
-            String lexeme;
             Column column = null;
             group = new ArrayList<>();
             do {
-                lexeme = nextLexeme();
+                nextLexeme();
                 column = parseColumn();
                 if (column != null) {
                     group.add(column);
                 }
-            } while ((lexeme = nextLexeme()).equals(","));
+            } while (nextLexeme().equals(","));
         } catch (QueryException e) {
             e.getError();
         }
         pos--;
         return group;
+    }
+
+    private List<Sort> parseOrderBy() {
+        ArrayList<Sort> orderBy = null;
+        Sort sort =  null;
+        try {
+            String lexeme;
+            Column column = null;
+            orderBy = new ArrayList<>();
+            do {
+                sort = null;
+                nextLexeme();
+                column = parseColumn();
+                sort = new Sort(column);
+                lexeme = nextLexeme();
+                if (lexeme.equals("asc")) {
+                    sort.setAsc();
+                } else if (lexeme.equals("desc")) {
+                    sort.setDesc();
+                } else {
+                    pos--;
+                }
+                if (sort != null) {
+                    orderBy.add(sort);
+                }
+            } while ((lexeme = nextLexeme()).equals(","));
+        } catch (QueryException e) {
+            if (sort != null) {
+                orderBy.add(sort);
+            }
+            e.getError();
+        }
+        pos--;
+        return orderBy;
     }
 
     private Join parseJoin(Join.JoinType type) {

@@ -1,21 +1,30 @@
 package Query.QueryItems;
 
 public class Sort {
-    static final int ASC = 1;
-    static final int DESC = -1;
+    private static final int ASC = 1;
+    private static final int DESC = -1;
     Column column;
     int sortType;
 
-    Sort(Column col, int type) {
+    public Sort(Column col) {
         this.column = col;
-        this.sortType = type;
+        sortType = ASC;  //default
+    }
+
+    public void setAsc() {
+        this.sortType = ASC;
+    }
+
+    public void setDesc() {
+        this.sortType = DESC;
     }
 
     public String print(String pad) {
+        pad = pad + "\t";
         if (sortType == 1) {
-            return "sort: " + column.print(pad) + "ascending";
+            return column.print(pad) + "\n"+ pad + "ascending";
         } else if (sortType == -1) {
-            return "sort: " + column.print(pad) + "descending";
+            return column.print(pad) + "\n"+ pad + "descending";
         } else
             return "";
     }
