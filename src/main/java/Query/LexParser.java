@@ -25,7 +25,7 @@ public class LexParser {
                     addLexeme();
                     lexemes.add(String.valueOf(input.charAt(pos)));
                 } //parse operators like =, <=, <>, ...
-                else if ((input.charAt(pos) == '<') || (input.charAt(pos) == '>') || (input.charAt(pos) == '=')) {
+                else if ((input.charAt(pos) == '<') || (input.charAt(pos) == '>') || (input.charAt(pos) == '=') || (input.charAt(pos) == '!')) {
                     addLexeme();
                     buf.append(input.charAt(pos));
                     pos++;
@@ -54,28 +54,28 @@ public class LexParser {
         String lexeme;
         try {
             while (!(lexeme = nextLexeme()).equals(")")) {
-                if (lexeme.equals("select")) {
-                    q.setSelectItems(parseSelect());
-                    //System.out.println("Select");
-                } else if (lexeme.equals("from")) {
-                    q.setFromSources(parseFrom());
-                    //System.out.println("From");
-                } else if (lexeme.equals("where")) {
-                    q.setWhereClauses(parseWhere());
-                    //System.out.println("Where");
-                } else if (lexeme.equals("group")) {
-                    if (nextLexeme().equals("by")) {
-                        q.setGroupByColumns(parseGroupBy());
-                        //System.out.println("Where");
-                    }
-                } else if (lexeme.equals("order")) {
-                    if (nextLexeme().equals("by")) {
-                        q.setSortColumns(parseOrderBy());
-                        //System.out.println("Where");
-                    }
+                switch (lexeme) {
+                    case "select":
+                        q.setSelectItems(parseSelect());
+                        break;
+                    case "from":
+                        q.setFromSources(parseFrom());
+                        break;
+                    case "where":
+                        q.setWhereClauses(parseWhere());
+                        break;
+                    case "group":
+                        if (nextLexeme().equals("by")) {
+                            q.setGroupByColumns(parseGroupBy());
+                        }
+                        break;
+                    case "order":
+                        if (nextLexeme().equals("by")) {
+                            q.setSortColumns(parseOrderBy());
+                        }
+                        break;
                 }
-
-                }
+            }
         } catch (QueryException e) {
             e.getError();
             return;
@@ -232,6 +232,7 @@ public class LexParser {
                     case "<=":
                         operator = WhereClause.OperatorType.LESS_OR_EQUAL;;
                         break;
+                    case "!=":
                     case "<>":
                         operator = WhereClause.OperatorType.NOT_EQUAL;
                         break;

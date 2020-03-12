@@ -2,21 +2,15 @@ package Query.QueryItems;
 
 public class WhereClause extends QueryItem{
     public enum OperatorType {
-        EQUAL("="),
-        NOT_EQUAL("<>"),
-        MORE(">"),
-        LESS("<"),
-        MORE_OR_EQUAL(">="),
-        LESS_OR_EQUAL("<="),
-        IN("IN"),
-        NOT_IN("NOT IN"),
-        LIKE("LIKE");
-
-        private String operator;
-
-        OperatorType(String operator) {
-            this.operator = operator;
-        }
+        EQUAL,
+        NOT_EQUAL,
+        MORE,
+        LESS,
+        MORE_OR_EQUAL,
+        LESS_OR_EQUAL,
+        IN,
+        NOT_IN,
+        LIKE;
     }
 
     //connection type for next where clause
