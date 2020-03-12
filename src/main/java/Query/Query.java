@@ -138,4 +138,8 @@ public class Query {
         }
         return strResult.toString();
     }
+
+    public String print() throws QueryException {
+        return print("");
+    }
 }
