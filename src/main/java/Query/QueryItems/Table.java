@@ -20,7 +20,7 @@ public class Table extends QueryItem {
         if (alias == null) {
             return res;
         } else {
-            return res + "\n" + pad +  "alias: " + alias;
+            return res + "\n" + pad + "alias: " + alias;
         }
     }
 }

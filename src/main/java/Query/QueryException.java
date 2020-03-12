@@ -1,6 +1,6 @@
 package Query;
 
-public class QueryException extends Exception{
+public class QueryException extends Exception {
     private String code;
     private String message;
 
@@ -14,4 +14,7 @@ public class QueryException extends Exception{
         return code + ": " + message;
     }
 
+    public String getCode() {
+        return code;
+    }
 }

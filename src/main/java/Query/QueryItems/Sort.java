@@ -22,9 +22,9 @@ public class Sort {
     public String print(String pad) {
         pad = pad + "\t";
         if (sortType == 1) {
-            return column.print(pad) + "\n"+ pad + "ascending";
+            return column.print(pad) + "\n" + pad + "ascending";
         } else if (sortType == -1) {
-            return column.print(pad) + "\n"+ pad + "descending";
+            return column.print(pad) + "\n" + pad + "descending";
         } else
             return "";
     }

@@ -1,6 +1,6 @@
 package Query.QueryItems;
 
-public class WhereClause extends QueryItem{
+public class WhereClause extends QueryItem {
     public enum OperatorType {
         EQUAL,
         NOT_EQUAL,
@@ -35,10 +35,10 @@ public class WhereClause extends QueryItem{
     }
 
     public String print(String pad) {
-        String newpad =  pad + "\t";
-        String res = column.print(newpad) + " \n" + newpad + "operator: " + operator.name() + "\n" +  item.print(newpad);
+        String newpad = pad + "\t";
+        String res = column.print(newpad) + " \n" + newpad + "operator: " + operator.name() + "\n" + item.print(newpad);
         if (next != null) {
-            res =  res + "\n" + pad + next.name();
+            res = res + "\n" + pad + next.name();
         }
         return res;
     }

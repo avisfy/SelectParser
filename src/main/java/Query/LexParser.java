@@ -6,21 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LexParser {
-    private String input;
     private ArrayList<String> lexemes;
     private StringBuilder buf;
     private int pos;
+    private static final String END_LEXEMES_EXCEPTION = "LEXEMES_PARSER_EXCEPTION";
     private static final String LEXEMES_EXCEPTION = "LEXEMES_PARSER_EXCEPTION";
 
-    public LexParser(String strInput) {
-        input = strInput;
+    public LexParser(String input) {
         pos = 0;
-        buf = new StringBuilder("");
+        buf = new StringBuilder();
         lexemes = new ArrayList<>();
 
-        while ((pos < input.length()) && (input.charAt(pos) != ';')) {
+        while (pos < input.length()) {
             if (!Character.isWhitespace(input.charAt(pos))) {
-                if ((input.charAt(pos) == '(') || (input.charAt(pos) == ')') || (input.charAt(pos) == '\'') || (input.charAt(pos) == ',') || (input.charAt(pos) == '.')) {
+                if ((input.charAt(pos) == '(') || (input.charAt(pos) == ')') || (input.charAt(pos) == '\'') || (input.charAt(pos) == ',') || (input.charAt(pos) == '.') || (input.charAt(pos) == ';')) {
                     //if buffer contains lexemes, add it
                     addLexeme();
                     lexemes.add(String.valueOf(input.charAt(pos)));
@@ -49,11 +48,10 @@ public class LexParser {
         pos = 0;
     }
 
-
-    public void parseQuery(Query q) {
+    public void parseQuery(Query q) throws QueryException {
         String lexeme;
         try {
-            while (!(lexeme = nextLexeme()).equals(")")) {
+            while (!((lexeme = nextLexeme()).equals(")") || lexeme.equals(";"))) {
                 switch (lexeme) {
                     case "select":
                         q.setSelectItems(parseSelect());
@@ -74,19 +72,26 @@ public class LexParser {
                             q.setSortColumns(parseOrderBy());
                         }
                         break;
+                    case "limit":
+                        q.setLimit(parseLim());
+                        break;
+                    case "offset":
+                        q.setOffset(parseLim());
+                        break;
                 }
             }
         } catch (QueryException e) {
-            e.getError();
-            return;
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
         }
     }
 
-    private ArrayList<QueryItem> parseSelect() {
+    private ArrayList<QueryItem> parseSelect() throws QueryException {
         ArrayList<QueryItem> selectItems = null;
         try {
             String lexeme;
-            QueryItem column = null;
+            QueryItem column;
             FunctionColumn.Functions fun;
             selectItems = new ArrayList<>();
             do {
@@ -127,23 +132,24 @@ public class LexParser {
                         //case primitive number
                         if (Character.isDigit(lexeme.charAt(0))) {
                             column = parsePrim();
-                        } else{
+                        } else {
                             column = parseColumn();
                         }
                 }
                 if (column != null) {
                     selectItems.add(column);
                 }
-            } while ((lexeme = nextLexeme()).equals(","));
+            } while ((nextLexeme()).equals(","));
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION))
+                throw e;
         }
         pos--;
         return selectItems;
     }
 
 
-    private List<QueryItem> parseFrom() {
+    private List<QueryItem> parseFrom() throws QueryException {
         List<QueryItem> sources = null;
         try {
             String lexeme1 = nextLexeme();
@@ -194,12 +200,13 @@ public class LexParser {
             }
             pos--;
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION))
+                throw e;
         }
         return sources;
     }
 
-    private List<WhereClause> parseWhere() {
+    private List<WhereClause> parseWhere() throws QueryException {
         List<WhereClause> where = null;
         WhereClause whereItem = null;
         try {
@@ -213,7 +220,7 @@ public class LexParser {
             do {
                 operator = null;
                 whereItem = null;
-                lexeme = nextLexeme();
+                nextLexeme();
                 operand1 = parseColumn();
                 lexeme = nextLexeme();
                 switch (lexeme) {
@@ -227,10 +234,10 @@ public class LexParser {
                         operator = WhereClause.OperatorType.MORE_OR_EQUAL;
                         break;
                     case "<":
-                        operator = WhereClause.OperatorType.LESS;;
+                        operator = WhereClause.OperatorType.LESS;
                         break;
                     case "<=":
-                        operator = WhereClause.OperatorType.LESS_OR_EQUAL;;
+                        operator = WhereClause.OperatorType.LESS_OR_EQUAL;
                         break;
                     case "!=":
                     case "<>":
@@ -252,37 +259,37 @@ public class LexParser {
                 if (Character.isDigit(lexeme.charAt(0)) || lexeme.equals("'")) {
                     operand2 = parsePrim();
                 } else if (lexeme.equals("(")) {
-                    operand2 =  parseSubq();
-                }
-                else {
+                    operand2 = parseSubq();
+                } else {
                     operand2 = parseColumn();
                 }
-                if (operator != null) {
+                if ((operator != null) && (operand2 != null)) {
                     whereItem = new WhereClause(operand1, operator, operand2);
                     lexeme = nextLexeme();
                     if (lexeme.equals("and")) {
                         whereItem.setNext(WhereClause.ConnectionType.AND);
-                    } else if (lexeme.equals("or")){
+                    } else if (lexeme.equals("or")) {
                         whereItem.setNext(WhereClause.ConnectionType.OR);
                     } else {
-                        where.add(whereItem);
                         isEnd = true;
                     }
                     where.add(whereItem);
                 }
             } while (!isEnd);
         } catch (QueryException e) {
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
             //if end of query but last where clause not saved
             if (whereItem != null) {
                 where.add(whereItem);
             }
-            e.getError();
         }
         pos--;
         return where;
     }
 
-    private List<Column> parseGroupBy() {
+    private List<Column> parseGroupBy() throws QueryException {
         ArrayList<Column> group = null;
         try {
             Column column = null;
@@ -295,15 +302,16 @@ public class LexParser {
                 }
             } while (nextLexeme().equals(","));
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION))
+                throw e;
         }
         pos--;
         return group;
     }
 
-    private List<Sort> parseOrderBy() {
+    private List<Sort> parseOrderBy() throws QueryException {
         ArrayList<Sort> orderBy = null;
-        Sort sort =  null;
+        Sort sort = null;
         try {
             String lexeme;
             Column column = null;
@@ -321,21 +329,34 @@ public class LexParser {
                 } else {
                     pos--;
                 }
-                if (sort != null) {
-                    orderBy.add(sort);
-                }
-            } while ((lexeme = nextLexeme()).equals(","));
+                orderBy.add(sort);
+            } while (nextLexeme().equals(","));
         } catch (QueryException e) {
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
             if (sort != null) {
                 orderBy.add(sort);
             }
-            e.getError();
         }
         pos--;
         return orderBy;
     }
 
-    private Join parseJoin(Join.JoinType type) {
+    private Integer parseLim() throws QueryException {
+        Integer lim = null;
+        try {
+            String lexeme = nextLexeme();
+            lim = Integer.valueOf(lexeme);
+        } catch (QueryException e) {
+            throw e;
+        } catch (NumberFormatException e) {
+            throw new QueryException(LEXEMES_EXCEPTION, "Error parsing limit or offset number: wrong number format");
+        }
+        return lim;
+    }
+
+    private Join parseJoin(Join.JoinType type) throws QueryException {
         Join join = null;
         Table joinedTable = null;
         boolean isBrackets = true;
@@ -346,10 +367,14 @@ public class LexParser {
                 return join;
             }
             //skip "join"
-            nextLexeme();
+            if (!nextLexeme().equals("join")) {
+                throw new QueryException(LEXEMES_EXCEPTION, "JOIN not found");
+            }
             joinedTable = parseTable();
             //skip "on"
-            nextLexeme();
+            if (!nextLexeme().equals("on")) {
+                throw new QueryException(LEXEMES_EXCEPTION, "ON not found");
+            }
             //if join condition not in brackets
             if (!nextLexeme().equals("(")) {
                 pos--;
@@ -357,22 +382,31 @@ public class LexParser {
             }
             nextLexeme();
             Column column1 = parseColumn();
+            if (column1 == null) {
+                throw new QueryException(LEXEMES_EXCEPTION, "join column not found");
+            }
             //skip "="
-            nextLexeme();
+            if (!nextLexeme().equals("=")) {
+                throw new QueryException(LEXEMES_EXCEPTION, "join column not found");
+            }
             nextLexeme();
             Column column2 = parseColumn();
+            if (column2 == null) {
+                throw new QueryException(LEXEMES_EXCEPTION, "join column not found");
+            }
             join = new Join(type, joinedTable, column1, column2);
             //if join condition in brackets, skip ")"
             if (isBrackets)
                 nextLexeme();
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION))
+                throw e;
         }
         return join;
     }
 
 
-    private Subquery parseSubq() {
+    private Subquery parseSubq() throws QueryException {
         Query q;
         Subquery subQuery = null;
         try {
@@ -393,13 +427,13 @@ public class LexParser {
                 }
             }
         } catch (QueryException e) {
-            e.getError();
-            subQuery = null;
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION))
+                throw e;
         }
         return subQuery;
     }
 
-    private Table parseTable() {
+    private Table parseTable() throws QueryException {
         Table table = null;
         String lexeme1 = "";
         String lexeme2 = "";
@@ -414,7 +448,9 @@ public class LexParser {
                 table = new Table(lexeme1);
             }
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
             if (!lexeme1.isEmpty()) {
                 table = new Table(lexeme1);
             }
@@ -423,20 +459,16 @@ public class LexParser {
     }
 
 
-    private Column parseColumn() {
+    private Column parseColumn() throws QueryException {
         Column column = null;
-        String lexeme;
         String str1 = "";
         String str2 = "";
         String str3 = "";
         pos--;
         try {
-        lexeme = nextLexeme();
-        str1 = lexeme;
-        str2 = "";
-        str3 = "";
-
+            str1 = nextLexeme();
             str2 = nextLexeme();
+            str3 = "";
             if (str2.equals(".")) {
                 //means that str1 - table name, str2 - column name
                 str2 = nextLexeme();
@@ -454,7 +486,9 @@ public class LexParser {
                 column = new Column(str1, str2);
             }
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
             if (str3.isEmpty()) {
                 column = new Column(str1, str2);
             } else {
@@ -465,7 +499,7 @@ public class LexParser {
     }
 
     //column in aggregate function
-    private FunctionColumn parseAggregateFunct(FunctionColumn.Functions fun) {
+    private FunctionColumn parseAggregateFunct(FunctionColumn.Functions fun) throws QueryException {
         FunctionColumn column = null;
         String str1 = "";
         String str2 = "";
@@ -495,7 +529,9 @@ public class LexParser {
                 column = new FunctionColumn(fun, col);
             }
         } catch (QueryException e) {
-            e.getError();
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
             if (str3.isEmpty()) {
                 column = new FunctionColumn(fun, col);
             } else {
@@ -505,7 +541,7 @@ public class LexParser {
         return column;
     }
 
-    private Primitive parsePrim() {
+    private Primitive parsePrim() throws QueryException {
         String lexeme = "";
         Primitive prim = null;
         pos--;
@@ -516,13 +552,15 @@ public class LexParser {
                 lexeme = nextLexeme();
                 prim = new Primitive(lexeme);
                 //skip '
+                lexeme = "";
                 nextLexeme();
             } else {
                 //case float primitive
-                if (lexeme.indexOf(".") != -1) {
-                    Double number = Double.valueOf(lexeme);
+                if (nextLexeme().equals(".")) {
+                    Double number = Double.valueOf(lexeme + "." + nextLexeme());
                     prim = new Primitive(number);
                 } else {
+                    pos--;
                     Integer number = Integer.valueOf(lexeme);
                     prim = new Primitive(number);
                 }
@@ -534,11 +572,17 @@ public class LexParser {
             } else {
                 pos--;
             }
+        } catch (QueryException e) {
+            if (e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
+            if (!lexeme.isEmpty()) {
+                Integer number = Integer.valueOf(lexeme);
+                prim = new Primitive(number);
+            }
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            prim = null;
-        } catch (QueryException e) {
-            e.getError();
+            throw new QueryException(LEXEMES_EXCEPTION, "Error parsing primitive: wrong number format");
         }
         return prim;
     }
@@ -547,7 +591,7 @@ public class LexParser {
         if (pos < lexemes.size()) {
             return lexemes.get(pos++);
         } else {
-            throw new QueryException(LEXEMES_EXCEPTION, "End of lexemes array");
+            throw new QueryException(END_LEXEMES_EXCEPTION, "End of lexemes array");
         }
     }
 
