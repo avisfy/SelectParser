@@ -1,6 +1,6 @@
 package Query.QueryItems;
 
-public class WhereClause extends QueryItem {
+public class Clause extends QueryItem {
     public enum OperatorType {
         EQUAL,
         NOT_EQUAL,
@@ -19,12 +19,12 @@ public class WhereClause extends QueryItem {
         OR
     }
 
-    private Column column;
+    private QueryItem column;
     private OperatorType operator;
     private QueryItem item;
     private ConnectionType next = null;
 
-    public WhereClause(Column col1, OperatorType operator, QueryItem col2) {
+    public Clause(QueryItem col1, OperatorType operator, QueryItem col2) {
         column = col1;
         this.operator = operator;
         item = col2;

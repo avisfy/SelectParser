@@ -8,7 +8,8 @@ import java.util.List;
 public class Query {
     private List<QueryItem> selectItems = null;
     private List<QueryItem> fromSources = null;
-    private List<WhereClause> whereClauses = null;
+    private List<Clause> whereClauses = null;
+    private List<Clause> havingClauses = null;
     private List<Column> groupByColumns = null;
     private List<Sort> sortColumns = null;
     private Integer limit = null;
@@ -38,9 +39,15 @@ public class Query {
         }
     }
 
-    public void setWhereClauses(List<WhereClause> whereClauses) {
+    public void setWhereClauses(List<Clause> whereClauses) {
         if ((whereClauses != null) && !whereClauses.isEmpty()) {
             this.whereClauses = whereClauses;
+        }
+    }
+
+    public void setHavingClauses(List<Clause> havingClauses) {
+        if ((havingClauses != null) && !havingClauses.isEmpty()) {
+            this.havingClauses = havingClauses;
         }
     }
 
@@ -92,7 +99,7 @@ public class Query {
         }
         if (whereClauses != null) {
             strResult.append(pad + "WHERE:\n");
-            for (WhereClause where : whereClauses) {
+            for (Clause where : whereClauses) {
                 strResult.append(where.print(newPad));
                 strResult.append("\n");
             }
@@ -101,6 +108,13 @@ public class Query {
             strResult.append(pad + "GROUP BY:\n");
             for (Column group : groupByColumns) {
                 strResult.append(group.print(newPad));
+                strResult.append("\n");
+            }
+        }
+        if (havingClauses != null) {
+            strResult.append(pad + "HAVING:\n");
+            for (Clause having : havingClauses) {
+                strResult.append(having.print(newPad));
                 strResult.append("\n");
             }
         }

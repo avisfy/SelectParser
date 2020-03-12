@@ -67,6 +67,9 @@ public class LexParser {
                             q.setGroupByColumns(parseGroupBy());
                         }
                         break;
+                    case "having":
+                        q.setHavingClauses(parseHaving());
+                        break;
                     case "order":
                         if (nextLexeme().equals("by")) {
                             q.setSortColumns(parseOrderBy());
@@ -206,14 +209,14 @@ public class LexParser {
         return sources;
     }
 
-    private List<WhereClause> parseWhere() throws QueryException {
-        List<WhereClause> where = null;
-        WhereClause whereItem = null;
+    private List<Clause> parseWhere() throws QueryException {
+        List<Clause> where = null;
+        Clause whereItem = null;
         try {
             String lexeme;
             Column operand1 = null;
             QueryItem operand2 = null;
-            WhereClause.OperatorType operator;
+            Clause.OperatorType operator;
             where = new ArrayList<>();
             //no AND or OR lexeme after where clause means end of where;
             boolean isEnd = false;
@@ -225,34 +228,34 @@ public class LexParser {
                 lexeme = nextLexeme();
                 switch (lexeme) {
                     case "=":
-                        operator = WhereClause.OperatorType.EQUAL;
+                        operator = Clause.OperatorType.EQUAL;
                         break;
                     case ">":
-                        operator = WhereClause.OperatorType.MORE;
+                        operator = Clause.OperatorType.MORE;
                         break;
                     case ">=":
-                        operator = WhereClause.OperatorType.MORE_OR_EQUAL;
+                        operator = Clause.OperatorType.MORE_OR_EQUAL;
                         break;
                     case "<":
-                        operator = WhereClause.OperatorType.LESS;
+                        operator = Clause.OperatorType.LESS;
                         break;
                     case "<=":
-                        operator = WhereClause.OperatorType.LESS_OR_EQUAL;
+                        operator = Clause.OperatorType.LESS_OR_EQUAL;
                         break;
                     case "!=":
                     case "<>":
-                        operator = WhereClause.OperatorType.NOT_EQUAL;
+                        operator = Clause.OperatorType.NOT_EQUAL;
                         break;
                     case "in":
-                        operator = WhereClause.OperatorType.IN;
+                        operator = Clause.OperatorType.IN;
                         break;
                     case "not":
                         if (nextLexeme().equals("in")) {
-                            operator = WhereClause.OperatorType.NOT_IN;
+                            operator = Clause.OperatorType.NOT_IN;
                         } else throw new QueryException(LEXEMES_EXCEPTION, "Error operator");
                         break;
                     case "like":
-                        operator = WhereClause.OperatorType.LIKE;
+                        operator = Clause.OperatorType.LIKE;
                         break;
                 }
                 lexeme = nextLexeme();
@@ -264,12 +267,12 @@ public class LexParser {
                     operand2 = parseColumn();
                 }
                 if ((operator != null) && (operand2 != null)) {
-                    whereItem = new WhereClause(operand1, operator, operand2);
+                    whereItem = new Clause(operand1, operator, operand2);
                     lexeme = nextLexeme();
                     if (lexeme.equals("and")) {
-                        whereItem.setNext(WhereClause.ConnectionType.AND);
+                        whereItem.setNext(Clause.ConnectionType.AND);
                     } else if (lexeme.equals("or")) {
-                        whereItem.setNext(WhereClause.ConnectionType.OR);
+                        whereItem.setNext(Clause.ConnectionType.OR);
                     } else {
                         isEnd = true;
                     }
@@ -307,6 +310,114 @@ public class LexParser {
         }
         pos--;
         return group;
+    }
+
+    private List<Clause> parseHaving() throws QueryException {
+        List<Clause> where = null;
+        Clause whereItem = null;
+        try {
+            String lexeme;
+            QueryItem operand1 = null;
+            QueryItem operand2 = null;
+            FunctionColumn.Functions fun = null;
+            Clause.OperatorType operator;
+            where = new ArrayList<>();
+            //no AND or OR lexeme after where clause means end of where;
+            boolean isEnd = false;
+            do {
+                operator = null;
+                whereItem = null;
+                lexeme = nextLexeme();
+                switch (lexeme) {
+                    case "max":
+                        fun = FunctionColumn.Functions.MAX;
+                        operand1 = parseAggregateFunct(fun);
+                        break;
+                    case "min":
+                        fun = FunctionColumn.Functions.MIN;
+                        operand1 = parseAggregateFunct(fun);
+                        break;
+                    case "avg":
+                        fun = FunctionColumn.Functions.AVG;
+                        operand1 = parseAggregateFunct(fun);
+                        break;
+                    case "sum":
+                        fun = FunctionColumn.Functions.SUM;
+                        operand1 = parseAggregateFunct(fun);
+                        break;
+                    case "count":
+                        fun = FunctionColumn.Functions.COUNT;
+                        operand1 = parseAggregateFunct(fun);
+                        break;
+                    //subquery
+                    default:
+                        operand1 = parseColumn();
+                }
+                lexeme = nextLexeme();
+                switch (lexeme) {
+                    case "=":
+                        operator = Clause.OperatorType.EQUAL;
+                        break;
+                    case ">":
+                        operator = Clause.OperatorType.MORE;
+                        break;
+                    case ">=":
+                        operator = Clause.OperatorType.MORE_OR_EQUAL;
+                        break;
+                    case "<":
+                        operator = Clause.OperatorType.LESS;
+                        break;
+                    case "<=":
+                        operator = Clause.OperatorType.LESS_OR_EQUAL;
+                        break;
+                    case "!=":
+                    case "<>":
+                        operator = Clause.OperatorType.NOT_EQUAL;
+                        break;
+                    case "in":
+                        operator = Clause.OperatorType.IN;
+                        break;
+                    case "not":
+                        if (nextLexeme().equals("in")) {
+                            operator = Clause.OperatorType.NOT_IN;
+                        } else throw new QueryException(LEXEMES_EXCEPTION, "Error operator");
+                        break;
+                    case "like":
+                        operator = Clause.OperatorType.LIKE;
+                        break;
+                }
+                lexeme = nextLexeme();
+                if (Character.isDigit(lexeme.charAt(0)) || lexeme.equals("'")) {
+                    operand2 = parsePrim();
+                } else if (lexeme.equals("(")) {
+                    operand2 = parseSubq();
+                } else {
+                    operand2 = parseColumn();
+                }
+                if ((operator != null) && (operand2 != null)) {
+                    whereItem = new Clause(operand1, operator, operand2);
+                    lexeme = nextLexeme();
+                    if (lexeme.equals("and")) {
+                        whereItem.setNext(Clause.ConnectionType.AND);
+                    } else if (lexeme.equals("or")) {
+                        whereItem.setNext(Clause.ConnectionType.OR);
+                    } else {
+                        isEnd = true;
+                    }
+                    where.add(whereItem);
+                }
+            } while (!isEnd);
+        } catch (QueryException e) {
+            if (!e.getCode().equals(END_LEXEMES_EXCEPTION)) {
+                throw e;
+            }
+            //if end of query but last where clause not saved
+            if (whereItem != null) {
+                where.add(whereItem);
+            }
+        }
+        pos--;
+        return where;
     }
 
     private List<Sort> parseOrderBy() throws QueryException {
