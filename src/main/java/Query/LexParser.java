@@ -63,9 +63,14 @@ public class LexParser {
                 } else if (lexeme.equals("where")) {
                     q.setWhereClauses(parseWhere());
                     //System.out.println("Where");
-                    //lexeme = nextLexeme();
+                } else if (lexeme.equals("group")) {
+                    if (nextLexeme().equals("by")) {
+                        q.setGroupByColumns(parseGroupBy());
+                        //System.out.println("Where");
+                    }
                 }
-            }
+
+                }
         } catch (QueryException e) {
             e.getError();
             return;
@@ -269,6 +274,26 @@ public class LexParser {
         }
         pos--;
         return where;
+    }
+
+    private List<Column> parseGroupBy() {
+        ArrayList<Column> group = null;
+        try {
+            String lexeme;
+            Column column = null;
+            group = new ArrayList<>();
+            do {
+                lexeme = nextLexeme();
+                column = parseColumn();
+                if (column != null) {
+                    group.add(column);
+                }
+            } while ((lexeme = nextLexeme()).equals(","));
+        } catch (QueryException e) {
+            e.getError();
+        }
+        pos--;
+        return group;
     }
 
     private Join parseJoin(Join.JoinType type) {

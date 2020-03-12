@@ -45,7 +45,9 @@ public class Query {
     }
 
     public void setGroupByColumns(List<Column> groupByColumns) {
-        this.groupByColumns = groupByColumns;
+        if (!groupByColumns.isEmpty()) {
+            this.groupByColumns = groupByColumns;
+        }
     }
 
     public void setSortColumns(List<Sort> sortColumns) {
