@@ -1,18 +1,18 @@
-package Query.QueryItems;
+package SelectQuery.QueryItems;
 
-import Query.Query;
-import Query.QueryException;
+import SelectQuery.SelectQuery;
+import SelectQuery.QueryException;
 
 public class Subquery extends QueryItem {
-    private Query subquery;
+    private SelectQuery subquery;
     private String alias = null;
 
-    public Subquery(Query subquery, String alias) {
+    public Subquery(SelectQuery subquery, String alias) {
         this.subquery = subquery;
         this.alias = alias;
     }
 
-    public Subquery(Query subquery) {
+    public Subquery(SelectQuery subquery) {
         this.subquery = subquery;
     }
 

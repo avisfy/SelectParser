@@ -1,4 +1,4 @@
-package Query;
+package SelectQuery;
 
 public class QueryException extends Exception {
     private String code;

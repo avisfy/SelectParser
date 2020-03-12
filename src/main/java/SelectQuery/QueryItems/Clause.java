@@ -1,4 +1,4 @@
-package Query.QueryItems;
+package SelectQuery.QueryItems;
 
 public class Clause extends QueryItem {
     public enum OperatorType {

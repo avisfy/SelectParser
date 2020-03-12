@@ -1,4 +1,4 @@
-package Query.QueryItems;
+package SelectQuery.QueryItems;
 
 abstract public class QueryItem {
 

@@ -1,4 +1,4 @@
-package Query.QueryItems;
+package SelectQuery.QueryItems;
 
 
 public class FunctionColumn extends QueryItem {

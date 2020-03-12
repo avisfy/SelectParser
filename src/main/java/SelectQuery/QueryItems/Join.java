@@ -1,6 +1,6 @@
-package Query.QueryItems;
+package SelectQuery.QueryItems;
 
-import Query.QueryException;
+import SelectQuery.QueryException;
 
 public class Join extends QueryItem {
     public enum JoinType {

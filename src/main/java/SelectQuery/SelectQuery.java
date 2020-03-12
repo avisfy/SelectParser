@@ -1,11 +1,11 @@
-package Query;
+package SelectQuery;
 
-import Query.QueryItems.*;
+import SelectQuery.QueryItems.*;
 
 
 import java.util.List;
 
-public class Query {
+public class SelectQuery {
     private List<QueryItem> selectItems = null;
     private List<QueryItem> fromSources = null;
     private List<Clause> whereClauses = null;
@@ -17,14 +17,14 @@ public class Query {
 
     private static final String QUERY_EXCEPTION = "QUERY_EXCEPTION";
 
-    public Query(String strQuery) throws QueryException {
+    public SelectQuery(String strQuery) throws QueryException {
         strQuery = strQuery.toLowerCase();
         LexParser parser = new LexParser(strQuery);
         //parser.printLexemes();
         parser.parseQuery(this);
     }
 
-    public Query() {
+    public SelectQuery() {
     }
 
     public void setSelectItems(List<QueryItem> selectItems) {

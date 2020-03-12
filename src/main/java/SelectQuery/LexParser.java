@@ -1,6 +1,6 @@
-package Query;
+package SelectQuery;
 
-import Query.QueryItems.*;
+import SelectQuery.QueryItems.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class LexParser {
         pos = 0;
     }
 
-    public void parseQuery(Query q) throws QueryException {
+    public void parseQuery(SelectQuery q) throws QueryException {
         String lexeme;
         try {
             while (!((lexeme = nextLexeme()).equals(")") || lexeme.equals(";"))) {
@@ -518,13 +518,13 @@ public class LexParser {
 
 
     private Subquery parseSubq() throws QueryException {
-        Query q;
+        SelectQuery q;
         Subquery subQuery = null;
         try {
             String lexeme = nextLexeme();
             if (lexeme.equals("select")) {
                 pos--;
-                q = new Query();
+                q = new SelectQuery();
                 parseQuery(q);
                 lexeme = nextLexeme();
                 if (lexeme.equals("as")) {
