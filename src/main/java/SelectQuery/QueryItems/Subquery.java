@@ -4,16 +4,19 @@ import SelectQuery.SelectQuery;
 import SelectQuery.QueryException;
 
 public class Subquery extends QueryItem {
-    private SelectQuery subquery;
-    private String alias = null;
+    private final SelectQuery subquery;
+    private final String alias;
 
+    //(SELECT ... subquery)  AS alias
     public Subquery(SelectQuery subquery, String alias) {
         this.subquery = subquery;
         this.alias = alias;
     }
 
+    //(SELECT ... subquery)
     public Subquery(SelectQuery subquery) {
         this.subquery = subquery;
+        alias = null;
     }
 
     public String print(String pad) {

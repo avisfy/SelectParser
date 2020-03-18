@@ -1,7 +1,7 @@
 package SelectQuery.QueryItems;
 
 public class Primitive extends QueryItem {
-    private Object primObj;
+    private final Object primObj;
     private String alias = null;
 
     public Primitive(Object primObj) {

@@ -7,20 +7,22 @@ public class FunctionColumn extends QueryItem {
         MIN, MAX, AVG, COUNT, SUM
     }
 
-    private Column column;
-    private Functions function = null;
-    private String alias;
+    private final Column column;
+    private final Functions function;
+    private final String alias;
 
-    //FUNCT(column)
+    //FUNCT(column) AS alias
     public FunctionColumn(Functions type, Column column, String alias) {
         this.function = type;
         this.column = column;
         this.alias = alias;
     }
 
+    //FUNCT(column)
     public FunctionColumn(Functions type, Column column) {
         this.function = type;
         this.column = column;
+        alias = null;
     }
 
     public String print(String pad) {

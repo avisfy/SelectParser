@@ -3,8 +3,8 @@ package SelectQuery.QueryItems;
 public class Sort {
     private static final int ASC = 1;
     private static final int DESC = -1;
-    Column column;
-    int sortType;
+    private final Column column;
+    private int sortType;
 
     public Sort(Column col) {
         this.column = col;

@@ -18,20 +18,23 @@ public class Join extends QueryItem {
     }
 
     private static final String JOIN_EXCEPTION = "JOIN_EXCEPTION";
-    private Table rTable = null;
-    private JoinType join = null;
-    private Column rTableCol = null;
-    private Column lTableCol = null;
+    private final Table rTable;
+    private final JoinType join;
+    private final Column lTableCol;
+    private final Column rTableCol;
 
     //for implicit join
     public Join(JoinType type, Table table) throws QueryException {
         if (type != JoinType.IMPLICIT_JOIN) {
             throw new QueryException(JOIN_EXCEPTION, "Attempt not implicitly join tables without columns");
         }
+        lTableCol = null;
+        rTableCol = null;
         rTable = table;
         join = type;
     }
 
+    //for not implicit join
     public Join(JoinType type, Table table, Column col1, Column col2) throws QueryException {
         if (type == JoinType.IMPLICIT_JOIN) {
             throw new QueryException(JOIN_EXCEPTION, "Attempt implicitly join tables with columns");

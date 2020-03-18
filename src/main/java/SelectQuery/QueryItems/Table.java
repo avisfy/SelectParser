@@ -2,13 +2,16 @@ package SelectQuery.QueryItems;
 
 
 public class Table extends QueryItem {
-    private String name;
-    private String alias = null;
+    private final String name;
+    private final String alias;
 
+    //table_name
     public Table(String name) {
         this.name = name;
+        alias = null;
     }
 
+    //table_name AS alias
     public Table(String name, String alias) {
         this.name = name;
         this.alias = alias;

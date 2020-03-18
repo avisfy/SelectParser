@@ -1,18 +1,21 @@
 package SelectQuery.QueryItems;
 
+import java.util.Objects;
+
 public class Column extends QueryItem {
-    private Table source = null;
-    private String name = null;
-    private String alias = null;
-    private boolean isAll = false;
+    private final Table source;
+    private final String name;
+    private final String alias;
+    private final boolean isAll;
 
     //column with alias
     public Column(String name1, String name2, String alias) {
         if (!name2.isEmpty()) {
-            this.source = new Table(name1);
-            this.name = name2;
+            source = new Table(name1);
+            name = name2;
         } else {
-            this.name = name1;
+            name = name1;
+            source = null;
         }
         this.alias = alias;
         isAll = false;
@@ -21,17 +24,22 @@ public class Column extends QueryItem {
     //column without alias
     public Column(String name1, String name2) {
         if (!name2.isEmpty()) {
-            this.source = new Table(name1);
-            this.name = name2;
+            source = new Table(name1);
+            name = name2;
         } else {
-            this.name = name1;
+            name = name1;
+            source = null;
         }
+        this.alias = null;
         isAll = false;
     }
 
     //all case ("*")
     public Column() {
         isAll = true;
+        name = null;
+        source = null;
+        alias = null;
     }
 
     public String print(String pad) {

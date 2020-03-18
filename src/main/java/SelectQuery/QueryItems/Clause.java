@@ -13,15 +13,15 @@ public class Clause extends QueryItem {
         LIKE;
     }
 
-    //connection type for next where clause
+    //connection type for next WHERE clause
     public enum ConnectionType {
         AND,
         OR
     }
 
-    private QueryItem column;
-    private OperatorType operator;
-    private QueryItem item;
+    private final QueryItem column;
+    private final OperatorType operator;
+    private final QueryItem item;
     private ConnectionType next = null;
 
     public Clause(QueryItem col1, OperatorType operator, QueryItem col2) {
